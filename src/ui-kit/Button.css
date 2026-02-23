@@ -1,0 +1,54 @@
+.ui-btn {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ui-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Variants */
+.ui-btn--primary {
+  background: var(--color-accent);
+  color: white;
+}
+.ui-btn--primary:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+
+.ui-btn--secondary {
+  background: var(--color-bg-muted);
+  color: var(--color-text);
+}
+.ui-btn--secondary:hover:not(:disabled) {
+  background: var(--color-border);
+}
+
+.ui-btn--ghost {
+  background: transparent;
+  color: var(--color-text-muted);
+}
+.ui-btn--ghost:hover:not(:disabled) {
+  background: var(--color-bg-muted);
+  color: var(--color-text);
+}
+
+.ui-btn--danger {
+  background: var(--color-error);
+  color: white;
+}
+.ui-btn--danger:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+/* Sizes */
+.ui-btn--sm { padding: var(--space-1) var(--space-3); font-size: var(--text-sm); }
+.ui-btn--md { padding: var(--space-2) var(--space-4); font-size: var(--text-base); }
+.ui-btn--lg { padding: var(--space-3) var(--space-6); font-size: var(--text-lg); }
+
+.ui-btn--full { width: 100%; }

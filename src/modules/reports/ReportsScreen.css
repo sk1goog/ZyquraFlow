@@ -1,0 +1,7 @@
+.reports-screen {
+  max-width: 600px;
+}
+
+.reports-placeholder {
+  color: var(--color-text-muted);
+}

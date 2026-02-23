@@ -1,0 +1,49 @@
+/* Design tokens — light, friendly theme */
+:root {
+  /* Colors */
+  --color-bg: #f5f6f8;
+  --color-bg-elevated: #ffffff;
+  --color-bg-muted: #e8eaef;
+  --color-surface: #ffffff;
+  --color-border: #dde1e8;
+  --color-border-focus: #2e86c7;
+  --color-text: #2c3e50;
+  --color-text-muted: #5d6d7e;
+  --color-text-subtle: #85929e;
+  --color-accent: #2e86c7;
+  --color-accent-hover: #3498db;
+  --color-success: #27ae60;
+  --color-warning: #f39c12;
+  --color-error: #e74c3c;
+
+  /* Typography */
+  --font-sans: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+
+  /* Shadows (soft, for light theme) */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  /* Sidebar */
+  --sidebar-width: 220px;
+  --topbar-height: 48px;
+}
