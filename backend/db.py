@@ -37,7 +37,7 @@ def init_db():
             );
             INSERT OR IGNORE INTO config (key, value) VALUES
                 ('provider', 'ollama'),
-                ('model', 'llama3.2'),
+                ('model', 'llama3.2:3b'),
                 ('debug', 'false');
         """)
         conn.commit()

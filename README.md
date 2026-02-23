@@ -79,6 +79,14 @@ ZyquraFlow/
         └── _unlinked/     # Sessions not in a case
 ```
 
+## Tests
+
+- **Backend (pytest):** `npm run test:backend` — 26 API- und Schema-Tests (isolierte Temp-DB/Data).
+- **Frontend (Vitest):** `npm run test` — 5 Komponenten-Tests (API gemockt).
+- Beide nacheinander: `npm run test:backend && npm run test`
+
+Details und Erweiterung: [docs/TESTFAELLE.md](docs/TESTFAELLE.md).
+
 ## Usage
 
 1. **Sessions:** Create session → upload audio → paste transcript → Summarize
@@ -86,3 +94,11 @@ ZyquraFlow/
 3. **System:** Select Ollama model, toggle debug, check provider health
 
 If Ollama is not running, summarization returns a mock response but keeps the pipeline the same.
+
+## Ollama / Mac Mini M4
+
+Die App nutzt **Ollama** lokal. Standardmodell ist **llama3.2:3b** (geeignet für Mac Mini M4 mit 8 GB RAM).
+
+- **Empfohlen bei 8 GB:** `llama3.2:3b` oder `phi3:mini` (unter System → Anbieter & Modell wählbar).
+- **Bei 16 GB RAM:** z. B. `llama3.2` (7B) oder `mistral` für bessere Qualität.
+- Modelle installieren: `ollama pull llama3.2:3b` bzw. `ollama pull phi3:mini`.

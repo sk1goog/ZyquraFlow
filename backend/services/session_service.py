@@ -13,12 +13,14 @@ from backend.config import DATA_ROOT
 def _session_row_to_dto(row, summary_path=None):
     s = dict(row)
     summary_json = None
-    path = summary_path or (s.get("summary_path") and Path(s["summary_path"]))
-    if path and Path(path).exists():
-        try:
-            summary_json = json.loads(Path(path).read_text(encoding="utf-8"))
-        except Exception:
-            pass
+    raw = summary_path or s.get("summary_path")
+    if raw:
+        path = Path(raw) if Path(raw).is_absolute() else (DATA_ROOT / raw)
+        if path.exists():
+            try:
+                summary_json = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
     return {
         "session_id": s["session_id"],
         "case_id": s["case_id"],
@@ -116,6 +118,35 @@ def update_transcript(session_id: str, transcript: str) -> dict:
     return get_session(session_id)
 
 
+_whisper_models = {}  # model_id -> WhisperModel (Cache pro Modell)
+
+
+def _get_whisper_model():
+    model_id = get_config().get("whisper_model") or "base"
+    if model_id not in _whisper_models:
+        from faster_whisper import WhisperModel
+        _whisper_models[model_id] = WhisperModel(model_id, device="cpu", compute_type="int8")
+    return _whisper_models[model_id]
+
+
+def transcribe_session(session_id: str) -> dict:
+    """Speech-to-Text: Audio der Sitzung transkribieren, Transkript speichern."""
+    init_db()
+    s = get_session(session_id)
+    if not s:
+        raise ValueError(f"Session not found: {session_id}")
+    audio_rel = (s.get("audio_path") or "").strip()
+    if not audio_rel:
+        raise ValueError("Keine Audiodatei in dieser Sitzung. Bitte zuerst Audio hochladen.")
+    audio_path = DATA_ROOT / audio_rel
+    if not audio_path.exists():
+        raise ValueError(f"Audiodatei nicht gefunden: {audio_path}")
+    model = _get_whisper_model()
+    segments, _ = model.transcribe(str(audio_path), language=None)
+    text = " ".join(seg.text for seg in segments).strip()
+    return update_transcript(session_id, text)
+
+
 async def summarize_session(session_id: str) -> dict:
     import time
     import logging
@@ -174,7 +205,10 @@ async def summarize_session(session_id: str) -> dict:
 
 def link_session(session_id: str, case_id: str) -> None:
     from backend.storage import move_session_to_case
+    from backend.services import case_service
     init_db()
+    if case_service.get_case(case_id) is None:
+        raise ValueError(f"Case not found: {case_id}")
     with db_cursor() as cur:
         cur.execute("SELECT case_id FROM sessions WHERE session_id = ?", (session_id,))
         row = cur.fetchone()

@@ -7,19 +7,22 @@ import './SystemScreen.css'
 export function SystemScreen() {
   const [config, setConfig] = useState<SystemConfig | null>(null)
   const [providers, setProviders] = useState<ProviderInfo[]>([])
+  const [whisperModels, setWhisperModels] = useState<string[]>([])
   const [health, setHealth] = useState<HealthResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const load = async () => {
     try {
-      const [c, p, h] = await Promise.all([
+      const [c, p, w, h] = await Promise.all([
         api.getConfig(),
         api.listProviders(),
+        api.listWhisperModels(),
         api.getHealth(),
       ])
       setConfig(c)
       setProviders(p)
+      setWhisperModels(w.models ?? [])
       setHealth(h)
       setError(null)
     } catch (e) {
@@ -43,6 +46,10 @@ export function SystemScreen() {
 
   const handleDebugToggle = () => {
     updateConfig({ debug: !config?.debug })
+  }
+
+  const handleWhisperModelChange = (whisper_model: string) => {
+    updateConfig({ whisper_model })
   }
 
   const updateConfig = async (updates: Partial<SystemConfig>) => {
@@ -108,6 +115,28 @@ export function SystemScreen() {
               </option>
             ))}
           </select>
+          <p className="system-hint">
+            Für Mac Mini M4 (8 GB): llama3.2:3b oder phi3:mini empfohlen. Größere Modelle bei mehr RAM.
+          </p>
+        </div>
+      </Card>
+      <Card title="Transkription">
+        <div className="system-field">
+          <label>Whisper-Modell</label>
+          <select
+            value={config.whisper_model ?? 'base'}
+            onChange={(e) => handleWhisperModelChange(e.target.value)}
+            disabled={loading}
+          >
+            {whisperModels.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))}
+          </select>
+          <p className="system-hint">
+            base für Mac M4 8 GB; small/medium bei mehr RAM. Größere Modelle genauer, aber langsamer.
+          </p>
         </div>
       </Card>
       <Card title="Debug">

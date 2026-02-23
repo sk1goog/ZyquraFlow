@@ -1,4 +1,5 @@
 """FastAPI application."""
+import asyncio
 import tempfile
 from pathlib import Path
 
@@ -33,6 +34,7 @@ class ConfigPatchBody(BaseModel):
     provider: Optional[str] = None
     model: Optional[str] = None
     debug: Optional[bool] = None
+    whisper_model: Optional[str] = None
 
 
 @app.on_event("startup")
@@ -65,15 +67,40 @@ def get_system_config():
 
 @app.patch("/api/system/config")
 def patch_system_config(body: ConfigPatchBody):
-    set_config(provider=body.provider, model=body.model, debug=body.debug)
+    set_config(
+        provider=body.provider,
+        model=body.model,
+        debug=body.debug,
+        whisper_model=body.whisper_model,
+    )
     return get_config()
 
 
 @app.get("/api/system/providers")
 def list_providers():
     return [
-        {"id": "ollama", "name": "Ollama", "models": ["llama3.2", "llama3.1", "mistral", "codellama"]},
+        {
+            "id": "ollama",
+            "name": "Ollama",
+            "models": [
+                "llama3.2:3b",   # Empfohlen für Mac Mini M4 (8 GB)
+                "phi3:mini",
+                "llama3.2",
+                "llama3.1",
+                "mistral",
+                "codellama",
+            ],
+        },
     ]
+
+
+# Whisper-Modelle (faster-whisper): tiny, base, small, medium, large-v2, large-v3
+WHISPER_MODEL_IDS = ["tiny", "base", "small", "medium", "large-v2", "large-v3"]
+
+
+@app.get("/api/system/whisper-models")
+def list_whisper_models():
+    return {"models": WHISPER_MODEL_IDS}
 
 
 @app.post("/api/sessions")
@@ -113,6 +140,17 @@ async def upload_audio(session_id: str, file: UploadFile = File(...)):
 @app.put("/api/sessions/{session_id}/transcript")
 def update_transcript(session_id: str, body: TranscriptBody):
     return session_service.update_transcript(session_id, body.transcript)
+
+
+@app.post("/api/sessions/{session_id}/transcribe")
+async def transcribe(session_id: str):
+    """Speech-to-Text: Audio der Sitzung transkribieren, Transkript speichern."""
+    try:
+        loop = asyncio.get_event_loop()
+        s = await loop.run_in_executor(None, lambda: session_service.transcribe_session(session_id))
+        return s
+    except ValueError as e:
+        raise HTTPException(400, str(e))
 
 
 @app.post("/api/sessions/{session_id}/summarize")

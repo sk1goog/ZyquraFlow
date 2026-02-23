@@ -9,6 +9,7 @@ export function SessionsScreen() {
   const [selected, setSelected] = useState<SessionDto | null>(null)
   const [transcript, setTranscript] = useState('')
   const [loading, setLoading] = useState(false)
+  const [transcribing, setTranscribing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const loadSessions = useCallback(async () => {
@@ -70,6 +71,22 @@ export function SessionsScreen() {
       setError(e instanceof Error ? e.message : String(e))
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleTranscribe = async () => {
+    if (!selected) return
+    setError(null)
+    setTranscribing(true)
+    try {
+      const s = await api.transcribeSession(selected.session_id)
+      setSessions((prev) => prev.map((x) => (x.session_id === s.session_id ? s : x)))
+      setSelected(s)
+      setTranscript(s.transcript ?? '')
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setTranscribing(false)
     }
   }
 
@@ -142,6 +159,16 @@ export function SessionsScreen() {
                 disabled={loading}
               />
             </Card>
+            {selected.audio_path && (
+              <Card title="Transkription">
+                <Button
+                  onClick={handleTranscribe}
+                  disabled={loading || transcribing}
+                >
+                  {transcribing ? 'Transkription läuft …' : 'Transkription erstellen'}
+                </Button>
+              </Card>
+            )}
             <Card title="Transkript">
               <TextArea
                 value={transcript}

@@ -1,7 +1,7 @@
 """LLM provider registry and config."""
 from typing import Optional
 
-from backend.config import DEFAULT_PROVIDER, DEFAULT_MODEL, DEFAULT_DEBUG
+from backend.config import DEFAULT_PROVIDER, DEFAULT_MODEL, DEFAULT_DEBUG, WHISPER_MODEL
 from backend.db import init_db, get_conn
 
 
@@ -20,10 +20,16 @@ def get_config():
         "provider": rows.get("provider", DEFAULT_PROVIDER),
         "model": rows.get("model", DEFAULT_MODEL),
         "debug": rows.get("debug", str(DEFAULT_DEBUG)).lower() == "true",
+        "whisper_model": rows.get("whisper_model", WHISPER_MODEL),
     }
 
 
-def set_config(provider: Optional[str] = None, model: Optional[str] = None, debug: Optional[bool] = None):
+def set_config(
+    provider: Optional[str] = None,
+    model: Optional[str] = None,
+    debug: Optional[bool] = None,
+    whisper_model: Optional[str] = None,
+):
     init_db()
     conn = get_conn()
     cur = conn.cursor()
@@ -33,6 +39,8 @@ def set_config(provider: Optional[str] = None, model: Optional[str] = None, debu
         cur.execute("INSERT OR REPLACE INTO config (key, value) VALUES ('model', ?)", (model,))
     if debug is not None:
         cur.execute("INSERT OR REPLACE INTO config (key, value) VALUES ('debug', ?)", (str(debug).lower(),))
+    if whisper_model is not None:
+        cur.execute("INSERT OR REPLACE INTO config (key, value) VALUES ('whisper_model', ?)", (whisper_model,))
     conn.commit()
     conn.close()
 

@@ -52,6 +52,12 @@
   color: var(--color-text);
 }
 
+.system-hint {
+  margin: var(--space-2) 0 0 0;
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}
+
 .system-toggle {
   display: flex;
   align-items: center;

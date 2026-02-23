@@ -62,6 +62,12 @@ export async function updateTranscript(sessionId: string, transcript: string): P
   })
 }
 
+export async function transcribeSession(sessionId: string): Promise<SessionDto> {
+  return fetchApi<SessionDto>(`/api/sessions/${sessionId}/transcribe`, {
+    method: 'POST',
+  })
+}
+
 export async function summarizeSession(sessionId: string): Promise<SessionDto> {
   return fetchApi<SessionDto>(`/api/sessions/${sessionId}/summarize`, {
     method: 'POST',
@@ -110,6 +116,10 @@ export async function updateConfig(updates: Partial<SystemConfig>): Promise<Syst
 
 export async function listProviders(): Promise<ProviderInfo[]> {
   return fetchApi<ProviderInfo[]>('/api/system/providers')
+}
+
+export async function listWhisperModels(): Promise<{ models: string[] }> {
+  return fetchApi<{ models: string[] }>('/api/system/whisper-models')
 }
 
 export type { SummaryJson, SessionDto, CaseDto }

@@ -55,6 +55,7 @@ export interface SystemConfig {
   provider: string
   model: string
   debug: boolean
+  whisper_model: string
 }
 
 export interface HealthResponse {
